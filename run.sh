@@ -8,8 +8,8 @@ echo "Node: $(hostname)"
 echo "GPUs: $(nvidia-smi -L 2>/dev/null | wc -l)"
 nvidia-smi 2>/dev/null | head -10
 
-# Load modules
-module load python/3.11.5 cuda/12.6
+# Load modules (arrow must be loaded BEFORE venv activation for pyarrow)
+module load python/3.11.5 cuda/12.6 gcc arrow/23.0.1 thrift/0.22.0
 
 # Create virtualenv in SLURM_TMPDIR for fast I/O
 VENV=$SLURM_TMPDIR/venv
@@ -20,7 +20,7 @@ fi
 source $VENV/bin/activate
 
 # Install dependencies (cached wheels on Compute Canada)
-pip install --no-index torch tiktoken datasets 2>&1 | tail -3
+pip install --no-index torch tiktoken datasets
 echo "PyTorch $(python -c 'import torch; print(torch.__version__)')"
 echo "CUDA available: $(python -c 'import torch; print(torch.cuda.is_available())')"
 

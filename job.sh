@@ -15,24 +15,35 @@ echo "=== Job $SLURM_JOB_ID on $(hostname) ==="
 echo "Start: $(date)"
 nvidia-smi -L
 
-# Load modules
-module load python/3.11.5 cuda/12.6
+# Load modules (arrow+thrift BEFORE venv for pyarrow; no internet on compute nodes)
+module load python/3.11.5 cuda/12.6 gcc arrow/23.0.1 thrift/0.22.0
 
 # Create virtualenv in fast local storage
 python -m venv --system-site-packages $SLURM_TMPDIR/venv
 source $SLURM_TMPDIR/venv/bin/activate
 
 # Install deps (fast: cached wheels on CVMFS)
-pip install --no-index torch tiktoken datasets 2>&1 | tail -3
+pip install --no-index torch tiktoken datasets triton
+echo "Pip install done."
 echo "PyTorch: $(python -c 'import torch; print(torch.__version__, "CUDA:", torch.cuda.is_available(), "GPUs:", torch.cuda.device_count())')"
+
+# Pre-cached data (compute nodes have no internet)
+export TIKTOKEN_CACHE_DIR=~/scratch/muloco-1/tiktoken_cache
+export HF_DATASETS_OFFLINE=1
 
 # Copy repo to fast local storage
 cp -r ~/scratch/muloco-1 $SLURM_TMPDIR/muloco-1
 cd $SLURM_TMPDIR/muloco-1
 
+# Copy pre-downloaded HF dataset cache to fast local storage
+mkdir -p $SLURM_TMPDIR/data
+cp -r ~/scratch/muloco-1/data/wikitext $SLURM_TMPDIR/data/
+echo "Pre-cached HF data copied to $SLURM_TMPDIR/data/"
+
 echo ""
 echo "=== Running MuLoCo-1 training ==="
 python test_muloco.py \
+    --cache-dir $SLURM_TMPDIR/data \
     --dataset wikitext \
     --d-model 512 \
     --n-heads 8 \
