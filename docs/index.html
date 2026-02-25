@@ -227,95 +227,22 @@
   <div class="wide-container">
     <h2>Results</h2>
 
-    <h3>MuLoCo Outperforms DiLoCo at All Worker Counts</h3>
-    <p>
-      When measured relative to their respective data-parallel baselines, MuLoCo shows clear improvements over DiLoCo as the number of workers grows. This holds across all model sizes from 150M to 3.1B.
-    </p>
-    <div class="figure-row">
-      <div class="figure">
-        <img src="{{ site.baseurl }}/assets/images/worker_scaling_Width_1024.png" alt="Worker scaling comparison">
-        <p class="figure-caption">MuLoCo vs DiLoCo: relative performance degradation as workers increase. MuLoCo scales better at all K.</p>
-      </div>
-      <div class="figure">
-        <img src="{{ site.baseurl }}/assets/images/empirical_joint_normalized_table.png" alt="Scaling study results">
-        <p class="figure-caption">Performance relative to DP baselines across model sizes and worker counts. MuLoCo's advantage holds at scale.</p>
-      </div>
-    </div>
-
-    <h3>MuLoCo K=1: Pareto-Optimal Performance and Critical Batch Size</h3>
-    <p>
-      At 3.1B scale, MuLoCo K=1 achieves the best loss while tolerating much larger batch sizes than any other optimizer. This translates to a Pareto-optimal tradeoff between training time and final performance.
-    </p>
-    <div class="figure-row">
-      <div class="figure">
-        <img src="{{ site.baseurl }}/assets/images/hook_cbs.png" alt="Critical batch size comparison">
-        <p class="figure-caption">Performance vs batch size at 3.1B scale. MuLoCo K=1 has the largest critical batch size and best absolute performance.</p>
-      </div>
-      <div class="figure">
-        <img src="{{ site.baseurl }}/assets/images/time_vs_efficiency.png" alt="Training time efficiency">
-        <p class="figure-caption">K=1 MuLoCo achieves up to ~10% better FLOP efficiency than DP AdamW at the same training time.</p>
-      </div>
-    </div>
-
-    <h3>Batch Size Scaling at 3.1B</h3>
+    <h3>MuLoCo K=1: Larger Critical Batch Sizes, Better Performance</h3>
     <div class="figure">
-      <img src="{{ site.baseurl }}/assets/images/joint_muloco_diloco_3.1B_new_baselines.png" alt="Batch size scaling" style="max-width: 90%;">
-      <p class="figure-caption">MuLoCo has much larger critical batch sizes than DiLoCo at all worker counts, enabling substantially more parallelizable training.</p>
+      <img src="{{ site.baseurl }}/assets/images/hook_cbs.png" alt="Critical batch size comparison" style="max-width: 85%;">
+      <p class="figure-caption">Performance vs batch size at 3.1B scale. MuLoCo K=1 has the largest critical batch size and best absolute performance.</p>
     </div>
 
-    <h3>Scaling Laws: MuLoCo Scales Better with Compute</h3>
-    <div class="figure-row">
-      <div class="figure">
-        <img src="{{ site.baseurl }}/assets/images/power_law_N_MuLoCo.png" alt="MuLoCo scaling law">
-        <p class="figure-caption">MuLoCo compute scaling law fits (150M&ndash;3.1B). Exponents indicate strong scaling with compute.</p>
-      </div>
-      <div class="figure">
-        <img src="{{ site.baseurl }}/assets/images/power_law_N_DiLoCo.png" alt="DiLoCo scaling law">
-        <p class="figure-caption">DiLoCo compute scaling law fits. MuLoCo's exponents are consistently larger (better scaling).</p>
-      </div>
+    <h3>K=1 Batch Size Scaling Laws</h3>
+    <div class="figure">
+      <img src="{{ site.baseurl }}/assets/images/batch_size_k1_tokens.png" alt="K=1 batch size scaling laws" style="max-width: 85%;">
+      <p class="figure-caption">Critical batch size scaling laws for K=1. MuLoCo's critical batch size grows faster with model scale than all baselines.</p>
     </div>
 
     <h3>15B Scale: Wall-Clock Training Time</h3>
     <div class="figure">
-      <img src="{{ site.baseurl }}/assets/images/15b_wall_clock_combined_10_vs_6400gbps.png" alt="15B wall clock comparison" style="max-width: 90%;">
-      <p class="figure-caption">Idealized wall-clock training at 15B. K=16 MuLoCo is fastest under bandwidth constraints (left); K=1 MuLoCo is fastest in high-bandwidth datacenters (right).</p>
-    </div>
-
-    <h3>Why Does MuLoCo Work? Pseudogradient Alignment</h3>
-    <p>
-      Muon's orthonormalized optimizer steps produce pseudogradients that are more directionally aligned with the data-parallel pseudogradient. The spectral interference during averaging is also significantly reduced compared to DiLoCo.
-    </p>
-    <div class="figure-row">
-      <div class="figure">
-        <img src="{{ site.baseurl }}/assets/images/boxplot_step720_h30_optmuon.png" alt="MuLoCo pseudogradient alignment">
-        <p class="figure-caption">MuLoCo: pseudogradient cosine similarity to K=1 baseline. High and consistent alignment across layers.</p>
-      </div>
-      <div class="figure">
-        <img src="{{ site.baseurl }}/assets/images/boxplot_step720_h30_optadamw.png" alt="DiLoCo pseudogradient alignment">
-        <p class="figure-caption">DiLoCo: lower alignment that degrades faster with worker count, with high variance across layers.</p>
-      </div>
-    </div>
-    <div class="figure-row">
-      <div class="figure">
-        <img src="{{ site.baseurl }}/assets/images/spectrum_layers_11__orig_mod_feed_forward_w3_weight_workers16.png" alt="Pseudogradient spectrum">
-        <p class="figure-caption">Pseudogradient singular value spectrum. DiLoCo's spectrum collapses during averaging; MuLoCo's is preserved.</p>
-      </div>
-      <div class="figure">
-        <img src="{{ site.baseurl }}/assets/images/mean_spectral_decay.png" alt="Interference gap">
-        <p class="figure-caption">Top-5% interference gap. Grows with K for DiLoCo but shrinks for MuLoCo, explaining better worker scaling.</p>
-      </div>
-    </div>
-
-    <h3>Compatible with Compression and Streaming</h3>
-    <div class="figure-row">
-      <div class="figure">
-        <img src="{{ site.baseurl }}/assets/images/quant_plots_linear.png" alt="Linear quantization">
-        <p class="figure-caption">Linear quantization: 4-bit is lossless for both methods. MuLoCo outperforms DiLoCo at all bitwidths.</p>
-      </div>
-      <div class="figure">
-        <img src="{{ site.baseurl }}/assets/images/streaming_muloco.png" alt="Streaming compatibility">
-        <p class="figure-caption">Streaming (partitioned) communication: no degradation for either method. MuLoCo is fully compatible.</p>
-      </div>
+      <img src="{{ site.baseurl }}/assets/images/15b_wall_clock_combined_10_vs_6400gbps.png" alt="15B wall clock comparison" style="max-width: 85%;">
+      <p class="figure-caption">Wall-clock training at 15B. K=16 MuLoCo is fastest under bandwidth constraints (left); K=1 MuLoCo is fastest in high-bandwidth settings (right).</p>
     </div>
   </div>
 </section>
