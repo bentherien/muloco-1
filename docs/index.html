@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MuLoCo: Muon is all you need for Distributed Optimization</title>
+  <meta name="description" content="MuLoCo combines Muon inner optimization with outer Nesterov SGD for communication-efficient distributed LLM pre-training.">
+  {% seo %}
+  <style>
+    :root {
+      --primary: #1a56db;
+      --primary-dark: #1338a0;
+      --bg: #ffffff;
+      --bg-alt: #f8f9fc;
+      --text: #1f2937;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+      --code-bg: #f3f4f6;
+      --accent: #059669;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      color: var(--text);
+      line-height: 1.7;
+      background: var(--bg);
+    }
+
+    .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+    .wide-container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, #1e3a5f 0%, #1a56db 100%);
+      color: white;
+      padding: 80px 0 60px;
+      text-align: center;
+    }
+    .hero h1 { font-size: 3rem; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.02em; }
+    .hero .subtitle { font-size: 1.25rem; opacity: 0.9; margin-bottom: 28px; font-weight: 400; }
+    .hero .authors { font-size: 0.95rem; opacity: 0.8; margin-bottom: 24px; }
+    .hero .authors a { color: white; text-decoration: underline; text-underline-offset: 2px; }
+    .hero .affiliations { font-size: 0.85rem; opacity: 0.65; margin-bottom: 28px; }
+    .hero-links { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .hero-links a {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 10px 22px; border-radius: 8px; font-weight: 600;
+      text-decoration: none; font-size: 0.95rem; transition: all 0.15s;
+    }
+    .btn-white { background: white; color: var(--primary); }
+    .btn-white:hover { background: #f0f4ff; }
+    .btn-outline { border: 2px solid rgba(255,255,255,0.5); color: white; }
+    .btn-outline:hover { border-color: white; background: rgba(255,255,255,0.1); }
+
+    /* Sections */
+    section { padding: 60px 0; }
+    section:nth-child(even) { background: var(--bg-alt); }
+    section h2 {
+      font-size: 1.75rem; font-weight: 700; margin-bottom: 24px;
+      padding-bottom: 12px; border-bottom: 3px solid var(--primary);
+      display: inline-block;
+    }
+    section h3 { font-size: 1.2rem; font-weight: 600; margin: 24px 0 12px; color: var(--primary-dark); }
+    section p { margin-bottom: 16px; color: var(--text); }
+
+    /* Key findings grid */
+    .findings-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px; margin-top: 24px;
+    }
+    .finding-card {
+      background: white; border: 1px solid var(--border); border-radius: 12px;
+      padding: 24px; border-left: 4px solid var(--primary);
+    }
+    .finding-card h4 { font-size: 1rem; margin-bottom: 8px; color: var(--primary-dark); }
+    .finding-card p { font-size: 0.9rem; color: var(--text-muted); margin: 0; }
+
+    /* Figures */
+    .figure {
+      margin: 32px 0; text-align: center;
+    }
+    .figure img {
+      max-width: 100%; border: 1px solid var(--border); border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .figure-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+      margin: 32px 0;
+    }
+    .figure-row img {
+      width: 100%; border: 1px solid var(--border); border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .figure-caption {
+      font-size: 0.85rem; color: var(--text-muted); margin-top: 8px;
+      font-style: italic;
+    }
+
+    /* Table */
+    table {
+      width: 100%; border-collapse: collapse; margin: 20px 0;
+      font-size: 0.9rem;
+    }
+    th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+    th { background: var(--bg-alt); font-weight: 600; }
+    tr:hover { background: #fafbfd; }
+
+    /* Code blocks */
+    pre {
+      background: #1e293b; color: #e2e8f0; padding: 20px; border-radius: 10px;
+      overflow-x: auto; font-size: 0.85rem; line-height: 1.6; margin: 16px 0;
+    }
+    code { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; }
+    p code, li code {
+      background: var(--code-bg); padding: 2px 6px; border-radius: 4px;
+      font-size: 0.85em; color: #c7254e;
+    }
+
+    /* Install section */
+    .install-box {
+      background: white; border: 2px solid var(--primary); border-radius: 12px;
+      padding: 28px; margin: 24px 0;
+    }
+    .install-box h3 { margin-top: 0; color: var(--primary); }
+
+    /* Citation */
+    .citation-box {
+      background: #1e293b; border-radius: 12px; padding: 24px;
+      position: relative; margin: 24px 0;
+    }
+    .citation-box pre { padding: 0; margin: 0; background: transparent; }
+    .copy-btn {
+      position: absolute; top: 12px; right: 12px;
+      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2);
+      color: #e2e8f0; padding: 6px 14px; border-radius: 6px; cursor: pointer;
+      font-size: 0.8rem; transition: all 0.15s;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,0.25); }
+
+    /* Footer */
+    footer {
+      background: #1e293b; color: #94a3b8; padding: 40px 0;
+      text-align: center; font-size: 0.85rem;
+    }
+    footer a { color: #60a5fa; text-decoration: none; }
+
+    @media (max-width: 640px) {
+      .hero h1 { font-size: 2rem; }
+      .figure-row { grid-template-columns: 1fr; }
+      .findings-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Hero -->
+<header class="hero">
+  <div class="container">
+    <h1>MuLoCo</h1>
+    <p class="subtitle">Muon is all you need for Distributed Optimization</p>
+    <p class="authors">
+      <a href="https://scholar.google.com/citations?user=FILL">Benjamin Therien</a><sup>1,2,3</sup>,
+      Xiaolong Huang<sup>2,4</sup>,
+      Aaron Defazio<sup>1</sup>,
+      Irina Rish<sup>2,3</sup>,
+      Eugene Belilovsky<sup>2,4</sup>
+    </p>
+    <p class="affiliations"><sup>1</sup>FAIR at Meta &nbsp; <sup>2</sup>Mila &nbsp; <sup>3</sup>Universit&eacute; de Montr&eacute;al &nbsp; <sup>4</sup>Concordia University</p>
+    <div class="hero-links">
+      <a href="https://arxiv.org/abs/2505.23725" class="btn-white">Paper (arXiv)</a>
+      <a href="https://github.com/bentherien/muloco-1" class="btn-outline">GitHub</a>
+      <a href="#install" class="btn-outline">Install</a>
+    </div>
+  </div>
+</header>
+
+<!-- Abstract -->
+<section>
+  <div class="container">
+    <h2>Abstract</h2>
+    <p>
+      DiLoCo is a powerful framework for training large language models (LLMs), enabling larger optimal batch sizes and increased accelerator utilization under networking constraints. However, DiLoCo's performance degrades as the number of workers (K) increases. In this work, we posit that a related but often overlooked factor in DiLoCo's behavior is the choice of inner optimizer, which shapes the pseudogradient used by the outer optimizer.
+    </p>
+    <p>
+      We find that, relative to AdamW, Muon yields more <strong>directionally correct</strong> pseudogradients as the number of workers increases. Consistently across all scales (150M&ndash;3.1B), MuLoCo achieves superior performance to DiLoCo in absolute terms, while being compatible with quantization, streaming, and long synchronization intervals. At K=1, MuLoCo can even <strong>outperform the data-parallel gold standard</strong> while having larger critical batch sizes. We extrapolate to 15B scale and confirm these findings hold.
+    </p>
+  </div>
+</section>
+
+<!-- Key Findings -->
+<section>
+  <div class="container">
+    <h2>Key Findings</h2>
+    <div class="findings-grid">
+      <div class="finding-card">
+        <h4>Beats Data-Parallel at K=1</h4>
+        <p>MuLoCo K=1 outperforms DP Muon, DP AdamW, and DiLoCo K=1 at every scale from 150M to 3.1B parameters with extensive hyperparameter tuning.</p>
+      </div>
+      <div class="finding-card">
+        <h4>Much Larger Critical Batch Sizes</h4>
+        <p>MuLoCo K=1 matches DP Muon's optimal loss while using 8x larger batch sizes at 3.1B scale, enabling dramatically more parallelism.</p>
+      </div>
+      <div class="finding-card">
+        <h4>Pareto-Optimal Training Time</h4>
+        <p>For the same wall-clock training time, K=1 MuLoCo reaches up to ~10% lower loss than DP AdamW, thanks to its ability to leverage large batches.</p>
+      </div>
+      <div class="finding-card">
+        <h4>Better Worker Scaling</h4>
+        <p>At K>2, MuLoCo's performance relative to its DP baseline degrades more slowly than DiLoCo's, and this advantage is maintained at scale.</p>
+      </div>
+      <div class="finding-card">
+        <h4>Lossless 4-bit Compression</h4>
+        <p>Both MuLoCo and DiLoCo achieve effectively lossless communication with 4-bit quantization. MuLoCo outperforms DiLoCo under all compression schemes.</p>
+      </div>
+      <div class="finding-card">
+        <h4>Validated at 15B Scale</h4>
+        <p>MuLoCo K=1 trains at 16M token batch size while matching DP Muon and DiLoCo K=1 final loss and downstream accuracy at 15B parameters.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Results with Figures -->
+<section>
+  <div class="wide-container">
+    <h2>Results</h2>
+
+    <h3>MuLoCo Outperforms DiLoCo at All Worker Counts</h3>
+    <p>
+      When measured relative to their respective data-parallel baselines, MuLoCo shows clear improvements over DiLoCo as the number of workers grows. This holds across all model sizes from 150M to 3.1B.
+    </p>
+    <div class="figure-row">
+      <div class="figure">
+        <img src="{{ site.baseurl }}/assets/images/worker_scaling_Width_1024.png" alt="Worker scaling comparison">
+        <p class="figure-caption">MuLoCo vs DiLoCo: relative performance degradation as workers increase. MuLoCo scales better at all K.</p>
+      </div>
+      <div class="figure">
+        <img src="{{ site.baseurl }}/assets/images/empirical_joint_normalized_table.png" alt="Scaling study results">
+        <p class="figure-caption">Performance relative to DP baselines across model sizes and worker counts. MuLoCo's advantage holds at scale.</p>
+      </div>
+    </div>
+
+    <h3>MuLoCo K=1: Pareto-Optimal Performance and Critical Batch Size</h3>
+    <p>
+      At 3.1B scale, MuLoCo K=1 achieves the best loss while tolerating much larger batch sizes than any other optimizer. This translates to a Pareto-optimal tradeoff between training time and final performance.
+    </p>
+    <div class="figure-row">
+      <div class="figure">
+        <img src="{{ site.baseurl }}/assets/images/hook_cbs.png" alt="Critical batch size comparison">
+        <p class="figure-caption">Performance vs batch size at 3.1B scale. MuLoCo K=1 has the largest critical batch size and best absolute performance.</p>
+      </div>
+      <div class="figure">
+        <img src="{{ site.baseurl }}/assets/images/time_vs_efficiency.png" alt="Training time efficiency">
+        <p class="figure-caption">K=1 MuLoCo achieves up to ~10% better FLOP efficiency than DP AdamW at the same training time.</p>
+      </div>
+    </div>
+
+    <h3>Batch Size Scaling at 3.1B</h3>
+    <div class="figure">
+      <img src="{{ site.baseurl }}/assets/images/joint_muloco_diloco_3.1B_new_baselines.png" alt="Batch size scaling" style="max-width: 90%;">
+      <p class="figure-caption">MuLoCo has much larger critical batch sizes than DiLoCo at all worker counts, enabling substantially more parallelizable training.</p>
+    </div>
+
+    <h3>Scaling Laws: MuLoCo Scales Better with Compute</h3>
+    <div class="figure-row">
+      <div class="figure">
+        <img src="{{ site.baseurl }}/assets/images/power_law_N_MuLoCo.png" alt="MuLoCo scaling law">
+        <p class="figure-caption">MuLoCo compute scaling law fits (150M&ndash;3.1B). Exponents indicate strong scaling with compute.</p>
+      </div>
+      <div class="figure">
+        <img src="{{ site.baseurl }}/assets/images/power_law_N_DiLoCo.png" alt="DiLoCo scaling law">
+        <p class="figure-caption">DiLoCo compute scaling law fits. MuLoCo's exponents are consistently larger (better scaling).</p>
+      </div>
+    </div>
+
+    <h3>15B Scale: Wall-Clock Training Time</h3>
+    <div class="figure">
+      <img src="{{ site.baseurl }}/assets/images/15b_wall_clock_combined_10_vs_6400gbps.png" alt="15B wall clock comparison" style="max-width: 90%;">
+      <p class="figure-caption">Idealized wall-clock training at 15B. K=16 MuLoCo is fastest under bandwidth constraints (left); K=1 MuLoCo is fastest in high-bandwidth datacenters (right).</p>
+    </div>
+
+    <h3>Why Does MuLoCo Work? Pseudogradient Alignment</h3>
+    <p>
+      Muon's orthonormalized optimizer steps produce pseudogradients that are more directionally aligned with the data-parallel pseudogradient. The spectral interference during averaging is also significantly reduced compared to DiLoCo.
+    </p>
+    <div class="figure-row">
+      <div class="figure">
+        <img src="{{ site.baseurl }}/assets/images/boxplot_step720_h30_optmuon.png" alt="MuLoCo pseudogradient alignment">
+        <p class="figure-caption">MuLoCo: pseudogradient cosine similarity to K=1 baseline. High and consistent alignment across layers.</p>
+      </div>
+      <div class="figure">
+        <img src="{{ site.baseurl }}/assets/images/boxplot_step720_h30_optadamw.png" alt="DiLoCo pseudogradient alignment">
+        <p class="figure-caption">DiLoCo: lower alignment that degrades faster with worker count, with high variance across layers.</p>
+      </div>
+    </div>
+    <div class="figure-row">
+      <div class="figure">
+        <img src="{{ site.baseurl }}/assets/images/spectrum_layers_11__orig_mod_feed_forward_w3_weight_workers16.png" alt="Pseudogradient spectrum">
+        <p class="figure-caption">Pseudogradient singular value spectrum. DiLoCo's spectrum collapses during averaging; MuLoCo's is preserved.</p>
+      </div>
+      <div class="figure">
+        <img src="{{ site.baseurl }}/assets/images/mean_spectral_decay.png" alt="Interference gap">
+        <p class="figure-caption">Top-5% interference gap. Grows with K for DiLoCo but shrinks for MuLoCo, explaining better worker scaling.</p>
+      </div>
+    </div>
+
+    <h3>Compatible with Compression and Streaming</h3>
+    <div class="figure-row">
+      <div class="figure">
+        <img src="{{ site.baseurl }}/assets/images/quant_plots_linear.png" alt="Linear quantization">
+        <p class="figure-caption">Linear quantization: 4-bit is lossless for both methods. MuLoCo outperforms DiLoCo at all bitwidths.</p>
+      </div>
+      <div class="figure">
+        <img src="{{ site.baseurl }}/assets/images/streaming_muloco.png" alt="Streaming compatibility">
+        <p class="figure-caption">Streaming (partitioned) communication: no degradation for either method. MuLoCo is fully compatible.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Scaling Table -->
+<section>
+  <div class="container">
+    <h2>Scaling Study Results</h2>
+    <p>Final evaluation loss across model scales and worker counts. Bold indicates best loss per scale. All methods extensively tuned (2,200+ runs).</p>
+    <div style="overflow-x: auto;">
+    <table>
+      <thead>
+        <tr>
+          <th></th><th>Method</th><th>150M</th><th>416M</th><th>914M</th><th>1.76B</th><th>3.1B</th><th>15B</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td rowspan="2">DP</td><td>Muon</td><td>3.124</td><td>2.641</td><td>2.402</td><td>2.246</td><td>2.128</td><td><strong>1.864</strong></td></tr>
+        <tr><td>AdamW</td><td>3.158</td><td>2.682</td><td>2.440</td><td>2.266</td><td>2.145</td><td>1.887</td></tr>
+        <tr><td rowspan="2">K=1</td><td>MuLoCo</td><td><strong>3.120</strong></td><td><strong>2.638</strong></td><td><strong>2.400</strong></td><td><strong>2.238</strong></td><td><strong>2.122</strong></td><td>1.884</td></tr>
+        <tr><td>DiLoCo</td><td>3.142</td><td>2.650</td><td>2.411</td><td>2.265</td><td>2.136</td><td>1.891</td></tr>
+        <tr><td rowspan="2">K=16</td><td>MuLoCo</td><td>3.222</td><td>2.713</td><td>2.448</td><td>2.291</td><td>2.165</td><td>1.917</td></tr>
+        <tr><td>DiLoCo</td><td>3.326</td><td>2.808</td><td>2.522</td><td>2.348</td><td>2.215</td><td>1.906</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</section>
+
+<!-- Install -->
+<section id="install">
+  <div class="container">
+    <h2>Get Started</h2>
+    <div class="install-box">
+      <h3>Install</h3>
+<pre><code># PyTorch
+pip install "muloco[pytorch]"
+
+# JAX/Optax
+pip install "muloco[jax]"
+
+# From source
+git clone https://github.com/bentherien/muloco-1.git
+cd muloco-1
+pip install -e ".[pytorch]"</code></pre>
+    </div>
+
+    <h3>PyTorch Quick Start</h3>
+<pre><code>from muloco.pytorch import MuLoCo1, Muon
+
+# Classify params: Muon for 2D+ matrices, AdamW for the rest
+param_groups = [
+    {"params": matrix_params, "algorithm": "muon"},
+    {"params": other_params,  "algorithm": "adamw"},
+]
+
+optimizer = MuLoCo1(
+    params=param_groups,
+    inner_lr=0.02,       # Muon inner LR
+    outer_lr=0.7,        # Outer Nesterov SGD LR
+    outer_momentum=0.6,  # Outer momentum (lower than DiLoCo's 0.8)
+    sync_interval=30,    # H=30 inner steps per outer step
+)
+
+# Standard training loop
+for batch in dataloader:
+    loss = model(batch).loss
+    loss.backward()
+    optimizer.step()
+    optimizer.zero_grad()</code></pre>
+
+    <h3>JAX/Optax Quick Start</h3>
+<pre><code>from muloco.jax import muloco, diloco, muloco_wrapper
+
+# MuLoCo with Muon inner optimizer
+opt = muloco(learning_rate=0.02, outer_lr=0.7, outer_momentum=0.6, sync_interval=30)
+
+# Standard optax usage
+opt_state = opt.init(params)
+updates, opt_state = opt.update(grads, opt_state, params)
+params = optax.apply_updates(params, updates)</code></pre>
+  </div>
+</section>
+
+<!-- Citation -->
+<section>
+  <div class="container">
+    <h2>Citation</h2>
+    <p>If you use MuLoCo in your research, please cite our paper:</p>
+    <div class="citation-box">
+      <button class="copy-btn" onclick="copyBibtex()">Copy BibTeX</button>
+<pre><code id="bibtex">@article{therien2025muloco,
+    title={MuLoCo: Muon is all you need for Distributed Optimization},
+    author={Therien, Benjamin and Huang, Xiaolong and Defazio, Aaron
+            and Rish, Irina and Belilovsky, Eugene},
+    journal={arXiv preprint arXiv:2505.23725},
+    year={2025}
+}</code></pre>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>
+      <a href="https://arxiv.org/abs/2505.23725">Paper</a> &middot;
+      <a href="https://github.com/bentherien/muloco-1">GitHub</a> &middot;
+      MIT License
+    </p>
+    <p style="margin-top: 8px;">&copy; 2025 Benjamin Therien et al.</p>
+  </div>
+</footer>
+
+<script>
+function copyBibtex() {
+  const text = document.getElementById('bibtex').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy BibTeX', 2000);
+  });
+}
+</script>
+
+</body>
+</html>

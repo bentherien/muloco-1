@@ -4,7 +4,9 @@
 
 MuLoCo is an optimizer for distributed deep learning that combines a fast inner optimizer (Muon or AdamW) with an outer Nesterov SGD that synchronizes workers periodically using pseudogradients. This package provides the single-worker (K=1) variant, which serves as the building block for multi-worker distributed training.
 
-> **Reference:** Therien et al., *"MuLoCo: Muon is all you need for Distributed Optimization"*, 2025.
+> **Paper:** Benjamin Therien, Xiaolong Huang, Aaron Defazio, Irina Rish, Eugene Belilovsky.
+> *"MuLoCo: Muon is all you need for Distributed Optimization"*, 2025.
+> [[arXiv]](https://arxiv.org/abs/2505.23725) [[Project Page]](https://bentherien.github.io/muloco-1/)
 
 ## Installation
 
@@ -160,6 +162,17 @@ sbatch examples/job.sh
 python tests/test_jax.py
 python tests/test_jax.py --verbose
 python tests/test_jax.py --quick
+```
+
+## Citation
+
+```bibtex
+@article{therien2025muloco,
+    title={MuLoCo: Muon is all you need for Distributed Optimization},
+    author={Therien, Benjamin and Huang, Xiaolong and Defazio, Aaron and Rish, Irina and Belilovsky, Eugene},
+    journal={arXiv preprint arXiv:2505.23725},
+    year={2025}
+}
 ```
 
 ## License

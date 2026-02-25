@@ -1,0 +1,11 @@
+title: "MuLoCo"
+description: "Muon is all you need for Distributed Optimization"
+url: "https://bentherien.github.io"
+baseurl: "/muloco-1"
+theme: null
+plugins:
+  - jekyll-seo-tag
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
