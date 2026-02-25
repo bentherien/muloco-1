@@ -6,7 +6,7 @@ MuLoCo-1 is the K=1 (single-worker) variant of MuLoCo, the distributed optimizer
 
 > **Paper:** Benjamin Therien, Xiaolong Huang, Aaron Defazio, Irina Rish, Eugene Belilovsky.
 > *"MuLoCo: Muon is a Practical Inner Optimizer for DiLoCo"*, 2025.
-> [[arXiv]](https://arxiv.org/abs/2505.23725) [[Project Page]](https://bentherien.github.io/muloco/)
+> [[arXiv]](https://arxiv.org/abs/2505.23725) [[Project Page]](https://bentherien.github.io/muloco-1/)
 
 ## Installation
 
