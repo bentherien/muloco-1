@@ -24,16 +24,16 @@ source $SLURM_TMPDIR/venv/bin/activate
 
 # Install deps (fast: cached wheels on CVMFS)
 pip install --no-index torch tiktoken datasets triton
+
+# Install muloco package
+pip install -e ~/scratch/muloco-1
+
 echo "Pip install done."
 echo "PyTorch: $(python -c 'import torch; print(torch.__version__, "CUDA:", torch.cuda.is_available(), "GPUs:", torch.cuda.device_count())')"
 
 # Pre-cached data (compute nodes have no internet)
 export TIKTOKEN_CACHE_DIR=~/scratch/muloco-1/tiktoken_cache
 export HF_DATASETS_OFFLINE=1
-
-# Copy repo to fast local storage
-cp -r ~/scratch/muloco-1 $SLURM_TMPDIR/muloco-1
-cd $SLURM_TMPDIR/muloco-1
 
 # Copy pre-downloaded HF dataset cache to fast local storage
 mkdir -p $SLURM_TMPDIR/data
@@ -42,7 +42,7 @@ echo "Pre-cached HF data copied to $SLURM_TMPDIR/data/"
 
 echo ""
 echo "=== Running MuLoCo-1 training ==="
-python test_muloco.py \
+python ~/scratch/muloco-1/examples/train_lm.py \
     --cache-dir $SLURM_TMPDIR/data \
     --dataset wikitext \
     --d-model 512 \

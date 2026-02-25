@@ -10,9 +10,10 @@ Runs a series of tests to verify correctness:
   6. Comparison: MuLoCo vs plain Muon vs plain AdamW
 
 Usage:
-    python test_muloco_jax.py              # Run all tests
-    python test_muloco_jax.py --verbose     # Verbose output
-    python test_muloco_jax.py --quick       # Quick smoke test only
+    python -m pytest tests/test_jax.py         # Run with pytest
+    python tests/test_jax.py                   # Run directly
+    python tests/test_jax.py --verbose         # Verbose output
+    python tests/test_jax.py --quick           # Quick smoke test only
 """
 
 import argparse
@@ -23,7 +24,7 @@ import jax
 import jax.numpy as jnp
 import optax
 
-from muloco_jax import muloco_wrapper, muloco, diloco, MuLoCoState
+from muloco.jax import muloco_wrapper, muloco, diloco, MuLoCoState
 
 
 # ---------------------------------------------------------------------------

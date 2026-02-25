@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "muloco"
+version = "0.1.0"
+description = "MuLoCo: Muon is all you need for Distributed Optimization"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.9"
+authors = [
+    { name = "Benjamin Therien" },
+]
+keywords = ["deep-learning", "optimizer", "distributed", "muon", "muloco", "diloco"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+[project.optional-dependencies]
+pytorch = ["torch>=2.0"]
+jax = ["jax>=0.4", "jaxlib>=0.4", "optax>=0.2", "chex>=0.1"]
+examples = ["tiktoken", "datasets"]
+dev = ["pytest", "ruff"]
+
+[project.urls]
+Repository = "https://github.com/bentherien/muloco-1"
+
+[tool.setuptools.packages.find]
+include = ["muloco*"]
+
+[tool.ruff]
+line-length = 100

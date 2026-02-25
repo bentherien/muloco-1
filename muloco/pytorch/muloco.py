@@ -15,6 +15,8 @@ import torch.nn as nn
 from torch import Tensor
 from torch.optim.optimizer import Optimizer
 
+__all__ = ["MuLoCo1", "Muon", "zeropower_via_newtonschulz5", "adjust_lr_spectral_norm"]
+
 
 # ---------------------------------------------------------------------------
 # Newton-Schulz orthogonalization (from muon.py)
@@ -57,21 +59,32 @@ def adjust_lr_spectral_norm(lr: float, param_shape) -> float:
 
 
 # ---------------------------------------------------------------------------
-# Inner Muon optimizer (single-GPU, adapted from muon.py)
+# Muon optimizer (single-GPU, adapted from muon.py)
 # ---------------------------------------------------------------------------
 
-class _InnerMuon(Optimizer):
+class Muon(Optimizer):
     """
-    Single-GPU Muon optimizer for use as the inner optimizer in MuLoCo-1.
+    Single-GPU Muon optimizer.
 
-    Implements the same algorithm as dion_optimizer/muon.py:
+    Implements the Muon algorithm:
     - Newton-Schulz orthogonalization for 2D+ matrix parameters
     - AdamW for scalar/embedding/head parameters
     - Spectral norm LR scaling for Muon parameters
     - Momentum with optional Nesterov
 
-    This is a simplified version that removes distributed communication
-    (all-to-all, all-gather) since K=1 only needs single-GPU operations.
+    Can be used standalone or as the inner optimizer in MuLoCo1.
+
+    Args:
+        params: Model parameters or parameter groups. Each group can specify
+            an 'algorithm' key: 'muon' for 2D+ matrix params, 'adamw' for
+            scalar/embedding/head params.
+        lr: Learning rate.
+        mu: Momentum factor.
+        betas: (beta1, beta2) for AdamW (used for non-matrix parameters).
+        weight_decay: Weight decay coefficient.
+        epsilon: Numerical stability epsilon.
+        nesterov: Whether to use Nesterov momentum.
+        adjust_lr: LR adjustment mode ('spectral_norm', 'rms_norm', or None).
     """
 
     def __init__(
@@ -211,6 +224,10 @@ class _InnerMuon(Optimizer):
             p.data.addcdiv_(m_hat, v_hat.sqrt().add_(eps), value=-lr)
 
 
+# Backward compatibility alias
+_InnerMuon = Muon
+
+
 # ---------------------------------------------------------------------------
 # MuLoCo-1 optimizer
 # ---------------------------------------------------------------------------
@@ -274,7 +291,7 @@ class MuLoCo1:
         self.outer_step_count = 0
 
         # Create the inner Muon optimizer
-        self.inner_optimizer = _InnerMuon(
+        self.inner_optimizer = Muon(
             params=params,
             lr=inner_lr,
             mu=mu,

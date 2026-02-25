@@ -14,7 +14,8 @@ import chex
 import jax
 import jax.numpy as jnp
 import optax
-from optax._src import base
+
+__all__ = ["MuLoCoState", "muloco_wrapper", "muloco", "diloco"]
 
 
 class MuLoCoState(NamedTuple):
@@ -28,16 +29,16 @@ class MuLoCoState(NamedTuple):
     """
     inner_state: Any
     inner_count: chex.Array  # shape=(), dtype=jnp.int32
-    param_snapshot: base.Params
-    outer_momentum_buffer: base.Updates
+    param_snapshot: optax.Params
+    outer_momentum_buffer: optax.Updates
 
 
 def muloco_wrapper(
-    inner_optimizer: base.GradientTransformation,
+    inner_optimizer: optax.GradientTransformation,
     outer_lr: float = 0.7,
     outer_momentum: float = 0.6,
     sync_interval: int = 30,
-) -> base.GradientTransformation:
+) -> optax.GradientTransformation:
     """Wrap any inner optimizer with MuLoCo/DiLoCo K=1 outer Nesterov SGD.
 
     Every ``sync_interval`` inner steps, computes the pseudogradient
@@ -146,11 +147,11 @@ def muloco_wrapper(
 
         return final_updates, new_state
 
-    return base.GradientTransformation(init_fn, update_fn)
+    return optax.GradientTransformation(init_fn, update_fn)
 
 
 def muloco(
-    learning_rate: base.ScalarOrSchedule,
+    learning_rate: optax.ScalarOrSchedule,
     outer_lr: float = 0.7,
     outer_momentum: float = 0.6,
     sync_interval: int = 30,
@@ -162,7 +163,7 @@ def muloco(
     beta: float = 0.95,
     eps: float = 1e-8,
     weight_decay: float = 0.0,
-    weight_decay_mask: Optional[Union[Any, Callable[[base.Params], Any]]] = None,
+    weight_decay_mask: Optional[Union[Any, Callable[[optax.Params], Any]]] = None,
     mu_dtype: Optional[chex.ArrayDType] = None,
     *,
     nesterov: bool = True,
@@ -172,7 +173,7 @@ def muloco(
     adam_eps_root: float = 0.0,
     adam_weight_decay: float = 0.0,
     muon_weight_dimension_numbers=None,
-) -> base.GradientTransformation:
+) -> optax.GradientTransformation:
     """MuLoCo K=1: Muon inner optimizer + Nesterov SGD outer optimizer.
 
     Combines ``optax.contrib.muon`` as the inner optimizer with an outer
@@ -230,7 +231,7 @@ def muloco(
 
 
 def diloco(
-    learning_rate: base.ScalarOrSchedule,
+    learning_rate: optax.ScalarOrSchedule,
     outer_lr: float = 0.7,
     outer_momentum: float = 0.9,
     sync_interval: int = 30,
@@ -242,7 +243,7 @@ def diloco(
     mu_dtype: Optional[chex.ArrayDType] = None,
     *,
     nesterov: bool = True,
-) -> base.GradientTransformation:
+) -> optax.GradientTransformation:
     """DiLoCo K=1: AdamW inner optimizer + Nesterov SGD outer optimizer.
 
     Convenience function that uses ``optax.adamw`` as the inner optimizer

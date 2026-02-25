@@ -21,16 +21,12 @@ source $VENV/bin/activate
 
 # Install dependencies (cached wheels on Compute Canada)
 pip install --no-index torch tiktoken datasets
+
+# Install muloco package
+pip install -e ~/scratch/muloco-1
+
 echo "PyTorch $(python -c 'import torch; print(torch.__version__)')"
 echo "CUDA available: $(python -c 'import torch; print(torch.cuda.is_available())')"
-
-# Clone repo into SLURM_TMPDIR for fast I/O
-REPO=$SLURM_TMPDIR/muloco-1
-if [ ! -d "$REPO" ]; then
-    echo "Cloning repo..."
-    cp -r ~/scratch/muloco-1 $REPO
-fi
-cd $REPO
 
 echo ""
 echo "=== Starting MuLoCo-1 training ==="
@@ -38,7 +34,7 @@ echo "Dataset: wikitext-103"
 echo "Model: 512 dim, 8 heads, 8 layers (~50M params)"
 echo ""
 
-python test_muloco.py \
+python ~/scratch/muloco-1/examples/train_lm.py \
     --dataset wikitext \
     --d-model 512 \
     --n-heads 8 \

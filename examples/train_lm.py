@@ -1,14 +1,14 @@
 """
-Test script for MuLoCo-1 optimizer on a language modeling task.
+Training script for MuLoCo-1 optimizer on a language modeling task.
 
 Trains a GPT-style transformer on real text data (OpenWebText / WikiText)
 with the MuLoCo-1 optimizer (Muon inner + SGD Nesterov outer).
 
 Usage:
-    python test_muloco.py                        # Train with MuLoCo-1 on GPU
-    python test_muloco.py --compare              # Also train vanilla Muon baseline
-    python test_muloco.py --dataset wikitext      # Use WikiText-103 (smaller download)
-    python test_muloco.py --steps 5000 --d-model 512 --n-layers 8  # Bigger model
+    python train_lm.py                        # Train with MuLoCo-1 on GPU
+    python train_lm.py --compare              # Also train vanilla Muon baseline
+    python train_lm.py --dataset wikitext      # Use WikiText-103 (smaller download)
+    python train_lm.py --steps 5000 --d-model 512 --n-layers 8  # Bigger model
 """
 
 import argparse
@@ -21,7 +21,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
 
-from muloco import MuLoCo1, _InnerMuon
+from muloco.pytorch import MuLoCo1, Muon
 
 
 # ---------------------------------------------------------------------------
@@ -519,7 +519,7 @@ def main():
         if args.compile and hasattr(torch, "compile"):
             model_bl = torch.compile(model_bl)
 
-        muon_opt = _InnerMuon(
+        muon_opt = Muon(
             params=create_param_groups(model_bl),
             lr=args.inner_lr,
             weight_decay=args.weight_decay,
