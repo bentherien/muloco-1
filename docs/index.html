@@ -114,19 +114,19 @@ layout: null
       justify-content: center;
     }
     .x-icon-wrapper svg {
-      width: 36px;
-      height: 36px;
+      width: 34px;
+      height: 34px;
     }
-    .x-icon-wrapper .x-line {
-      stroke-dasharray: 40;
-      stroke-dashoffset: 40;
-      animation: drawX 1.2s ease forwards;
-    }
-    .x-icon-wrapper .x-line:nth-child(2) {
-      animation-delay: 0.3s;
+    .x-icon-wrapper .x-path {
+      stroke-dasharray: 220;
+      stroke-dashoffset: 220;
+      animation: drawX 3s ease infinite;
     }
     @keyframes drawX {
-      to { stroke-dashoffset: 0; }
+      0% { stroke-dashoffset: 220; }
+      40% { stroke-dashoffset: 0; }
+      60% { stroke-dashoffset: 0; }
+      100% { stroke-dashoffset: 220; }
     }
 
     /* Sections */
@@ -255,9 +255,8 @@ layout: null
       </a>
       <a href="https://x.com/benjamintherien/status/1928439450100715627" class="resource-link" target="_blank">
         <div class="x-icon-wrapper">
-          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <line class="x-line" x1="6" y1="6" x2="26" y2="26" stroke="#1f2937" stroke-width="3.5" stroke-linecap="round"/>
-            <line class="x-line" x1="26" y1="6" x2="6" y2="26" stroke="#1f2937" stroke-width="3.5" stroke-linecap="round"/>
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path class="x-path" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" stroke="#1f2937" stroke-width="0.8" stroke-linejoin="round" fill="none"/>
           </svg>
         </div>
         <span class="label">Tweet Thread</span>
