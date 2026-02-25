@@ -1,7 +1,7 @@
 title: "MuLoCo"
 description: "Muon is a Practical Inner Optimizer for DiLoCo"
 url: "https://bentherien.github.io"
-baseurl: "/muloco-1"
+baseurl: "/muloco"
 theme: null
 plugins:
   - jekyll-seo-tag
