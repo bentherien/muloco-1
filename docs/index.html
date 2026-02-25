@@ -45,17 +45,12 @@ layout: null
       border-bottom: 1px solid var(--border);
     }
     .hero h1 {
-      font-size: 2.8rem;
+      font-size: 3.6rem;
       font-weight: 800;
-      margin-bottom: 8px;
-      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+      letter-spacing: -0.025em;
       color: var(--text);
-    }
-    .hero .subtitle {
-      font-size: 1.15rem;
-      color: var(--text-muted);
-      margin-bottom: 28px;
-      font-weight: 400;
+      line-height: 1.15;
     }
     .hero .authors {
       font-size: 1.05rem;
@@ -187,7 +182,7 @@ layout: null
     footer a { color: #60a5fa; text-decoration: none; }
 
     @media (max-width: 640px) {
-      .hero h1 { font-size: 1.8rem; }
+      .hero h1 { font-size: 2rem; }
       .resource-links { gap: 20px; }
       .findings-grid { grid-template-columns: 1fr; }
     }
@@ -198,8 +193,7 @@ layout: null
 <!-- Hero -->
 <header class="hero">
   <div class="container">
-    <h1>MuLoCo</h1>
-    <p class="subtitle">Muon is a Practical Inner Optimizer for DiLoCo</p>
+    <h1>MuLoCo: Muon is a Practical Inner Optimizer for DiLoCo</h1>
     <p class="authors">
       <a href="https://scholar.google.com/citations?user=FILL">Benjamin Therien</a><sup>1,2,3</sup>,
       Xiaolong Huang<sup>2,4</sup>,
