@@ -11,23 +11,14 @@ MuLoCo-1 is the K=1 (single-worker) variant of MuLoCo, the distributed optimizer
 ## Installation
 
 ```bash
-pip install muloco
-```
-
-Install with framework-specific dependencies:
-
-```bash
 # PyTorch
-pip install "muloco[pytorch]"
+pip install "muloco[pytorch] @ git+https://github.com/bentherien/muloco-1.git"
 
 # JAX/Optax
-pip install "muloco[jax]"
+pip install "muloco[jax] @ git+https://github.com/bentherien/muloco-1.git"
 
 # Both frameworks
-pip install "muloco[pytorch,jax]"
-
-# With example script dependencies (tiktoken, datasets)
-pip install "muloco[pytorch,examples]"
+pip install "muloco[pytorch,jax] @ git+https://github.com/bentherien/muloco-1.git"
 ```
 
 For development:
