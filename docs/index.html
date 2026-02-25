@@ -77,6 +77,7 @@ layout: null
       align-items: flex-start;
       gap: 60px;
       padding-bottom: 40px;
+      flex-wrap: wrap;
     }
     .resource-link {
       display: flex;
@@ -87,7 +88,8 @@ layout: null
       font-weight: 600;
       font-size: 0.95rem;
       transition: color 0.15s;
-      min-width: 120px;
+      min-width: 100px;
+      flex-shrink: 0;
     }
     .resource-link:hover { color: var(--primary); }
     .resource-link lottie-player {
@@ -128,6 +130,28 @@ layout: null
       60% { stroke-dashoffset: 0; }
       100% { stroke-dashoffset: 220; }
     }
+
+    /* Table of contents */
+    .toc {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 28px;
+      display: inline-flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .toc a {
+      color: var(--primary);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: color 0.15s;
+    }
+    .toc a:hover { color: var(--primary-dark); text-decoration: underline; }
+    .toc-wrapper { text-align: center; padding: 20px 0 0; }
 
     /* Sections */
     section { padding: 60px 0; }
@@ -209,8 +233,16 @@ layout: null
     footer a { color: #60a5fa; text-decoration: none; }
 
     @media (max-width: 640px) {
-      .hero h1 { font-size: 2rem; }
-      .resource-links { gap: 24px; }
+      .hero h1 { font-size: 1.6rem; }
+      .hero { padding: 40px 0 16px; }
+      .resource-links { gap: 16px; }
+      .resource-link { min-width: 70px; font-size: 0.8rem; }
+      .resource-link lottie-player { width: 40px; height: 40px; }
+      .resource-link .sublabel { font-size: 0.65rem; }
+      .x-icon-wrapper { width: 40px; height: 40px; }
+      .x-icon-wrapper svg { width: 24px; height: 24px; }
+      .toc { gap: 14px; padding: 12px 16px; }
+      .toc a { font-size: 0.8rem; }
       .findings-grid { grid-template-columns: 1fr; }
     }
   </style>
@@ -265,21 +297,36 @@ layout: null
   </div>
 </header>
 
+<!-- Table of Contents -->
+<div class="toc-wrapper">
+  <nav class="toc">
+    <a href="#abstract">Abstract</a>
+    <a href="#findings">Key Findings</a>
+    <a href="#results">Results</a>
+    <a href="#scaling">Scaling Study</a>
+    <a href="#install">Get Started</a>
+    <a href="#citation">Citation</a>
+  </nav>
+</div>
+
 <!-- Abstract -->
-<section>
+<section id="abstract">
   <div class="container">
     <h2>Abstract</h2>
     <p>
-      DiLoCo is a powerful framework for training large language models (LLMs), enabling larger optimal batch sizes and increased accelerator utilization under networking constraints. However, DiLoCo's performance degrades as the number of workers (K) increases. In this work, we posit that a related but often overlooked factor in DiLoCo's behavior is the choice of inner optimizer, which shapes the pseudogradient used by the outer optimizer.
+      DiLoCo is a powerful framework for training large language models (LLMs), enabling larger optimal batch sizes and increased accelerator utilization under networking constraints. However, DiLoCo's performance has been shown to degrade as the number of workers (K) increases. In this work, we posit that a related but often overlooked factor in DiLoCo's behavior is the choice of inner optimizer, which shapes the pseudogradient used by the outer optimizer. Given the recent success of Muon relative to AdamW for data parallel (DP) training, we examine how Muon's normalized optimizer steps can affect the pseudogradient's quality.
     </p>
     <p>
-      We find that, relative to AdamW, Muon yields more <strong>directionally correct</strong> pseudogradients as the number of workers increases. Consistently across all scales (150M&ndash;3.1B), MuLoCo achieves superior performance to DiLoCo in absolute terms, while being compatible with quantization, streaming, and long synchronization intervals. At K=1, MuLoCo can even <strong>outperform the data-parallel gold standard</strong> while having larger critical batch sizes. We extrapolate to 15B scale and confirm these findings hold.
+      We find that, relative to AdamW, Muon yields more <strong>directionally correct</strong> pseudogradients as the number of workers (K) increases. In our experiments pre-training language models, we conduct extensive hyperparameter tuning across 150M, 416M, 914M, 1.76B, and 3.1B models for DiLoCo, MuLoCo, AdamW DP, and Muon DP. Consistently across all scales, we find that with K&ge;1 workers, MuLoCo (Muon inner optimizer DiLoCo) achieves superior performance to DiLoCo in absolute terms and for K&gt;2 it outperforms DiLoCo relative to their data parallel baselines, while being compatible with quantization, streaming, and long synchronization intervals.
+    </p>
+    <p>
+      At K=1, we find that MuLoCo can even <strong>outperform the data-parallel gold standard</strong> while having larger critical batch sizes. Finally, we extrapolate optimal hyperparameters to 15B scale and train a model with each method (six in total) using K=1 and K=16 workers. We find that K=16 MuLoCo nearly matches single-worker performance at this scale, while MuLoCo K=1 matches the best performing baseline while using a much larger 16M token batch size.
     </p>
   </div>
 </section>
 
 <!-- Key Findings -->
-<section>
+<section id="findings">
   <div class="container">
     <h2>Key Findings</h2>
     <div class="findings-grid">
@@ -312,7 +359,7 @@ layout: null
 </section>
 
 <!-- Results with Figures -->
-<section>
+<section id="results">
   <div class="wide-container">
     <h2>Results</h2>
 
@@ -337,7 +384,7 @@ layout: null
 </section>
 
 <!-- Scaling Table -->
-<section>
+<section id="scaling">
   <div class="container">
     <h2>Scaling Study Results</h2>
     <p>Final evaluation loss across model scales and worker counts. Bold indicates best loss per scale. All methods extensively tuned (2,200+ runs).</p>
@@ -417,7 +464,7 @@ params = optax.apply_updates(params, updates)</code></pre>
 </section>
 
 <!-- Citation -->
-<section>
+<section id="citation">
   <div class="container">
     <h2>Citation</h2>
     <p>If you use MuLoCo in your research, please cite our paper:</p>
