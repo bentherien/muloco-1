@@ -7,6 +7,7 @@ layout: null
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MuLoCo: Muon is a Practical Inner Optimizer for DiLoCo</title>
+  <link rel="icon" type="image/svg+xml" href="{{ site.baseurl }}/assets/favicon.svg">
   <meta name="description" content="MuLoCo combines Muon inner optimization with outer Nesterov SGD for communication-efficient distributed LLM pre-training.">
   {% seo %}
   <link href="https://fonts.googleapis.com" rel="preconnect">
@@ -72,10 +73,9 @@ layout: null
     /* Lottie resource links */
     .resource-links {
       display: flex;
-      gap: 36px;
       justify-content: center;
       align-items: flex-start;
-      flex-wrap: wrap;
+      gap: 60px;
       padding-bottom: 40px;
     }
     .resource-link {
@@ -87,6 +87,7 @@ layout: null
       font-weight: 600;
       font-size: 0.95rem;
       transition: color 0.15s;
+      min-width: 120px;
     }
     .resource-link:hover { color: var(--primary); }
     .resource-link lottie-player {
@@ -100,6 +101,32 @@ layout: null
       font-weight: 400;
       color: var(--text-muted);
       margin-top: 1px;
+      text-align: center;
+    }
+
+    /* Animated X icon */
+    .x-icon-wrapper {
+      width: 56px;
+      height: 56px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .x-icon-wrapper svg {
+      width: 36px;
+      height: 36px;
+    }
+    .x-icon-wrapper .x-line {
+      stroke-dasharray: 40;
+      stroke-dashoffset: 40;
+      animation: drawX 1.2s ease forwards;
+    }
+    .x-icon-wrapper .x-line:nth-child(2) {
+      animation-delay: 0.3s;
+    }
+    @keyframes drawX {
+      to { stroke-dashoffset: 0; }
     }
 
     /* Sections */
@@ -183,7 +210,7 @@ layout: null
 
     @media (max-width: 640px) {
       .hero h1 { font-size: 2rem; }
-      .resource-links { gap: 20px; }
+      .resource-links { gap: 24px; }
       .findings-grid { grid-template-columns: 1fr; }
     }
   </style>
@@ -216,15 +243,24 @@ layout: null
           background="transparent" speed="1" loop autoplay>
         </lottie-player>
         <span class="label">MuLoCo-1</span>
-        <span class="sublabel">PyTorch / JAX</span>
+        <span class="sublabel">(Optimizer Only)<br>PyTorch / JAX</span>
       </a>
       <a href="https://github.com/facebookresearch/MuLoCo" class="resource-link" target="_blank">
         <lottie-player
           src="https://cdn.prod.website-files.com/64f4d663be17b6544a586bac/64ff6aa162e6bf4dfccca45c_code.json"
           background="transparent" speed="1" loop autoplay>
         </lottie-player>
-        <span class="label">Full Research Code</span>
-        <span class="sublabel">Training &amp; evaluation</span>
+        <span class="label">MuLoCo</span>
+        <span class="sublabel">(Full Research Code)<br>Training &amp; Evaluation in PyTorch</span>
+      </a>
+      <a href="https://x.com/benjamintherien/status/1928439450100715627" class="resource-link" target="_blank">
+        <div class="x-icon-wrapper">
+          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <line class="x-line" x1="6" y1="6" x2="26" y2="26" stroke="#1f2937" stroke-width="3.5" stroke-linecap="round"/>
+            <line class="x-line" x1="26" y1="6" x2="6" y2="26" stroke="#1f2937" stroke-width="3.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="label">Tweet Thread</span>
       </a>
     </div>
   </div>
