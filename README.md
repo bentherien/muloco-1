@@ -1,11 +1,11 @@
-# MuLoCo
+# MuLoCo-1
 
-**Muon is all you need for Distributed Optimization**
+**The single-worker variant of MuLoCo that outperforms data-parallel Muon**
 
-MuLoCo is an optimizer for distributed deep learning that combines a fast inner optimizer (Muon or AdamW) with an outer Nesterov SGD that synchronizes workers periodically using pseudogradients. This package provides the single-worker (K=1) variant, which serves as the building block for multi-worker distributed training.
+MuLoCo-1 is the K=1 (single-worker) variant of MuLoCo, the distributed optimizer from [*"MuLoCo: Muon is a Practical Inner Optimizer for DiLoCo"*](https://arxiv.org/abs/2505.23725). It uses a Muon inner optimizer and smooths the optimization trajectory with an SGD outer optimizer using Nesterov momentum. Despite its simplicity, MuLoCo-1 consistently outperforms data-parallel Muon across all tested scales. The implementations use the default hyperparameters from the paper, which were shown to perform well from 150M to 15B parameters.
 
 > **Paper:** Benjamin Therien, Xiaolong Huang, Aaron Defazio, Irina Rish, Eugene Belilovsky.
-> *"MuLoCo: Muon is all you need for Distributed Optimization"*, 2025.
+> *"MuLoCo: Muon is a Practical Inner Optimizer for DiLoCo"*, 2025.
 > [[arXiv]](https://arxiv.org/abs/2505.23725) [[Project Page]](https://bentherien.github.io/muloco-1/)
 
 ## Installation
@@ -45,7 +45,7 @@ pip install -e ".[pytorch,jax,dev]"
 ```python
 from muloco.pytorch import MuLoCo1, Muon
 
-# Classify parameters: Muon for 2D+ matrices, AdamW for the rest
+# Classify parameters: Muon for 2D+ matrices, scalar optimizer for the rest
 param_groups = [
     {"params": matrix_params, "algorithm": "muon"},
     {"params": other_params, "algorithm": "adamw"},
@@ -168,7 +168,7 @@ python tests/test_jax.py --quick
 
 ```bibtex
 @article{therien2025muloco,
-    title={MuLoCo: Muon is all you need for Distributed Optimization},
+    title={MuLoCo: Muon is a Practical Inner Optimizer for DiLoCo},
     author={Therien, Benjamin and Huang, Xiaolong and Defazio, Aaron and Rish, Irina and Belilovsky, Eugene},
     journal={arXiv preprint arXiv:2505.23725},
     year={2025}

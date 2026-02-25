@@ -1,6 +1,6 @@
 # MuLoCo-1: Key Findings from the Paper
 
-> **MuLoCo: Muon is all you need for Distributed Optimization**
+> **MuLoCo: Muon is a Practical Inner Optimizer for DiLoCo**
 > Benjamin Therien, Xiaolong Huang, Aaron Defazio, Irina Rish, Eugene Belilovsky
 > arXiv: [2505.23725](https://arxiv.org/abs/2505.23725)
 
@@ -131,7 +131,7 @@ optimizer = MuLoCo1(
 
 ```bibtex
 @article{therien2025muloco,
-    title={MuLoCo: Muon is all you need for Distributed Optimization},
+    title={MuLoCo: Muon is a Practical Inner Optimizer for DiLoCo},
     author={Therien, Benjamin and Huang, Xiaolong and Defazio, Aaron and Rish, Irina and Belilovsky, Eugene},
     journal={arXiv preprint arXiv:2505.23725},
     year={2025}

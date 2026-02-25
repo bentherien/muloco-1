@@ -1,7 +1,7 @@
-"""MuLoCo: Muon is all you need for Distributed Optimization.
+"""MuLoCo: Muon is a Practical Inner Optimizer for DiLoCo.
 
-Reference: Therien et al., "MuLoCo: Muon is all you need for
-Distributed Optimization", 2025.
+Reference: Therien et al., "MuLoCo: Muon is a Practical Inner Optimizer for
+DiLoCo", 2025.
 
 Subpackages:
     muloco.pytorch — PyTorch implementation (MuLoCo1, Muon)

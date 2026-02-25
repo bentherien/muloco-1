@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "muloco"
 version = "0.1.0"
-description = "MuLoCo: Muon is all you need for Distributed Optimization"
+description = "MuLoCo: Muon is a Practical Inner Optimizer for DiLoCo"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.9"

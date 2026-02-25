@@ -5,7 +5,7 @@
 # runs for H steps, then an outer Nesterov SGD step is applied using
 # the pseudogradient (parameter delta).
 #
-# Reference: Therien et al., "MuLoCo: Muon is all you need for
+# Reference: Therien et al., "MuLoCo: Muon is a Practical Inner Optimizer for
 # Distributed Optimization", 2025.
 
 from typing import Any, Callable, NamedTuple, Optional, Sequence, Tuple, Union
