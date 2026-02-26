@@ -166,6 +166,12 @@ python tests/test_jax.py --quick
 }
 ```
 
+## Acknowledgments
+
+The Muon implementations used in MuLoCo are based on:
+- **PyTorch**: [Dion](https://github.com/microsoft/dion) by Microsoft
+- **JAX/Optax**: [optax.contrib.muon](https://github.com/google-deepmind/optax) by Google DeepMind
+
 ## License
 
 MIT
