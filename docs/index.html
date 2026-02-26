@@ -286,7 +286,7 @@ layout: null
         <span class="label">MuLoCo</span>
         <span class="sublabel">(Full Research Code)<br>Training &amp; Evaluation in PyTorch</span>
       </a>
-      <a href="https://x.com/benjamintherien/status/1928439450100715627" class="resource-link" target="_blank">
+      <a href="https://x.com/twitter/status/2026862326184304734" class="resource-link" target="_blank">
         <div class="x-icon-wrapper">
           <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path class="x-path" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" stroke="#1f2937" stroke-width="0.8" stroke-linejoin="round" fill="none"/>
@@ -461,15 +461,6 @@ opt = muloco(learning_rate=0.02, outer_lr=0.7, outer_momentum=0.6, sync_interval
 opt_state = opt.init(params)
 updates, opt_state = opt.update(grads, opt_state, params)
 params = optax.apply_updates(params, updates)</code></pre>
-  </div>
-</section>
-
-<!-- Acknowledgments -->
-<section>
-  <div class="container">
-    <h2>Acknowledgments</h2>
-    <p>The Muon implementations used in MuLoCo are based on:</p>
-    <p><strong>PyTorch:</strong> <a href="https://github.com/microsoft/dion">Dion</a> by Microsoft &nbsp;&nbsp; <strong>JAX/Optax:</strong> <a href="https://github.com/google-deepmind/optax">optax.contrib.muon</a> by Google DeepMind</p>
   </div>
 </section>
 
