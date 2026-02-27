@@ -2,7 +2,9 @@
 
 **The single-worker variant of MuLoCo that outperforms data-parallel Muon**
 
-MuLoCo-1 is the K=1 (single-worker) variant of MuLoCo, the distributed optimizer from [*"MuLoCo: Muon is a Practical Inner Optimizer for DiLoCo"*](https://arxiv.org/abs/2505.23725). It uses a Muon inner optimizer and smooths the optimization trajectory with an SGD outer optimizer using Nesterov momentum. Despite its simplicity, MuLoCo-1 consistently outperforms data-parallel Muon across all tested scales. The implementations use the default hyperparameters from the paper, which were shown to perform well from 150M to 15B parameters.
+<img align="right" src="assets/hook_cbs.png" width="380">
+
+MuLoCo-1 is the K=1 (single-worker) variant of MuLoCo, the distributed optimizer from [*"MuLoCo: Muon is a Practical Inner Optimizer for DiLoCo"*](https://arxiv.org/abs/2505.23725). It uses a Muon inner optimizer and smooths the optimization trajectory with an SGD outer optimizer using Nesterov momentum. Despite its simplicity, MuLoCo-1 consistently outperforms data-parallel Muon across all tested scales while achieving a **Pareto-optimal performance–training time tradeoff**: it reaches better loss than all baselines while tolerating much larger batch sizes, enabling dramatically faster training when hardware parallelism is available. The implementations use the default hyperparameters from the paper, which were shown to perform well from 150M to 15B parameters.
 
 > **Paper:** Benjamin Therien, Xiaolong Huang, Aaron Defazio, Irina Rish, Eugene Belilovsky.
 > *"MuLoCo: Muon is a Practical Inner Optimizer for DiLoCo"*, 2025.
@@ -154,6 +156,26 @@ python tests/test_jax.py
 python tests/test_jax.py --verbose
 python tests/test_jax.py --quick
 ```
+
+## Why MuLoCo-1? Scaling Analysis
+
+### Critical Batch Size Grows Nearly Linearly with Scale
+
+<p align="center"><img src="assets/batch_size_k1_tokens.png" width="550"></p>
+
+MuLoCo's critical batch size (the largest batch that doesn't hurt performance) scales nearly linearly with training tokens (exponent ~0.92), roughly **double** the rate of AdamW and DiLoCo (~0.46). This means MuLoCo can absorb far more data-parallel workers as models grow.
+
+### MuLoCo Needs Less Compute to Reach the Same Loss
+
+<p align="center"><img src="assets/iso_loss_compute_ratio.png" width="550"></p>
+
+To reach any given loss target, MuLoCo requires ~1.3x fewer FLOPs than AdamW at the largest observed scale (3.1B), and this advantage grows with scale.
+
+### Training Time Savings Are Even Larger
+
+<p align="center"><img src="assets/iso_loss_time_ratio.png" width="550"></p>
+
+Combining fewer FLOPs with much larger batch sizes, MuLoCo reaches the same loss in ~5x fewer sequential steps than AdamW at 3.1B scale. This gap widens rapidly: extrapolation suggests >10x at 15B+ scale.
 
 ## Citation
 
